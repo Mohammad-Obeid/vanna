@@ -2,6 +2,8 @@
 
 from typing import Any, Dict, List, Optional, Type, cast
 import uuid
+import math
+import numpy as np
 from vanna.core.tool import Tool, ToolContext, ToolResult
 from vanna.components import (
     UiComponent,
@@ -13,6 +15,31 @@ from vanna.components import (
 from vanna.capabilities.sql_runner import SqlRunner, RunSqlToolArgs
 from vanna.capabilities.file_system import FileSystem
 from vanna.integrations.local import LocalFileSystem
+
+
+def sanitize_dataframe(df):
+    """
+    Sanitize a DataFrame for JSON serialization.
+    Replaces NaN, Infinity, -Infinity with None.
+    Converts bytes to strings.
+    """
+    import pandas as pd
+    
+    # Create a copy to avoid modifying the original
+    df = df.copy()
+    
+    # Replace NaN, inf, -inf with None for all columns
+    df = df.replace([np.inf, -np.inf], None)
+    df = df.where(pd.notnull(df), None)
+    
+    # Convert any bytes columns to strings
+    for col in df.columns:
+        if df[col].dtype == object:
+            df[col] = df[col].apply(
+                lambda x: x.decode('utf-8', errors='replace') if isinstance(x, bytes) else x
+            )
+    
+    return df
 
 
 class RunSqlTool(Tool[RunSqlToolArgs]):
@@ -58,6 +85,9 @@ class RunSqlTool(Tool[RunSqlToolArgs]):
         try:
             # Use the injected SqlRunner to execute the query
             df = await self.sql_runner.run_sql(args, context)
+
+            # Sanitize DataFrame for JSON serialization (handles NaN, Infinity, bytes)
+            df = sanitize_dataframe(df)
 
             # Determine query type
             query_type = args.sql.strip().upper().split()[0]

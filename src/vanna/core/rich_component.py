@@ -5,12 +5,56 @@ This module provides the base RichComponent class and supporting enums
 for the component system.
 """
 
+import json
+import math
 import uuid
 from datetime import datetime
+from decimal import Decimal
 from enum import Enum
 from typing import Any, Dict, List, TypeVar
 
 from pydantic import BaseModel, Field
+
+
+class SafeJSONEncoder(json.JSONEncoder):
+    """Custom JSON encoder that handles special float values and other non-serializable types."""
+    def default(self, obj):
+        if isinstance(obj, float):
+            if math.isnan(obj) or math.isinf(obj):
+                return None
+        if isinstance(obj, Decimal):
+            return float(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, bytes):
+            return obj.decode('utf-8', errors='replace')
+        if isinstance(obj, Enum):
+            return obj.value
+        return super().default(obj)
+
+
+def sanitize_for_json(obj: Any) -> Any:
+    """Recursively sanitize an object for JSON serialization."""
+    if obj is None:
+        return None
+    if isinstance(obj, float):
+        if math.isnan(obj) or math.isinf(obj):
+            return None
+        return obj
+    if isinstance(obj, Decimal):
+        return float(obj)
+    if isinstance(obj, bytes):
+        return obj.decode('utf-8', errors='replace')
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, Enum):
+        return obj.value
+    if isinstance(obj, dict):
+        return {k: sanitize_for_json(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [sanitize_for_json(v) for v in obj]
+    return obj
+
 
 # Type variable for self-returning methods
 T = TypeVar("T", bound="RichComponent")
@@ -80,6 +124,12 @@ class RichComponent(BaseModel):
     timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     visible: bool = True
     interactive: bool = False
+
+    def model_dump_json(self, **kwargs) -> str:
+        """Override to use safe JSON serialization that handles NaN, Infinity, etc."""
+        data = self.model_dump(**kwargs)
+        sanitized = sanitize_for_json(data)
+        return json.dumps(sanitized, cls=SafeJSONEncoder)
 
     def update(self: T, **kwargs: Any) -> T:
         """Create an updated copy of this component."""

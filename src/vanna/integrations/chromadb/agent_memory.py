@@ -73,19 +73,40 @@ class ChromaAgentMemory(AgentMemory):
         return self._embedding_function
 
     def _get_collection(self):
-        """Get or create ChromaDB collection."""
+        """Get or create ChromaDB collection with cosine similarity.
+        
+        IMPORTANT: Uses cosine distance metric for accurate similarity scoring.
+        The formula `similarity = 1 - distance` only works correctly with cosine distance.
+        With L2 (Euclidean), distances can exceed 1.0, breaking similarity calculations.
+        """
         if self._collection is None:
             client = self._get_client()
             embedding_func = self._get_embedding_function()
+            
+            # Collection metadata with cosine distance for proper similarity scoring
+            collection_metadata = {
+                "description": "Tool usage memories for learning",
+                "hnsw:space": "cosine",  # CRITICAL: Use cosine for similarity = 1 - distance
+            }
+            
             try:
+                # Try to get existing collection
                 self._collection = client.get_collection(
                     name=self.collection_name, embedding_function=embedding_func
                 )
+                # Log if existing collection might have wrong metric
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.info(f"📦 Using existing ChromaDB collection: {self.collection_name}")
             except Exception:
+                # Create new collection with cosine metric
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.info(f"🆕 Creating new ChromaDB collection with COSINE metric: {self.collection_name}")
                 self._collection = client.create_collection(
                     name=self.collection_name,
                     embedding_function=embedding_func,
-                    metadata={"description": "Tool usage memories for learning"},
+                    metadata=collection_metadata,
                 )
         return self._collection
 
@@ -291,9 +312,23 @@ class ChromaAgentMemory(AgentMemory):
         context: ToolContext,
         *,
         limit: int = 10,
-        similarity_threshold: float = 0.7,
+        similarity_threshold: float = 0.30,  # Lowered from 0.7 - cosine similarity threshold
     ) -> List[TextMemorySearchResult]:
-        """Search for similar text memories."""
+        """Search for similar text memories using cosine similarity.
+        
+        Args:
+            query: The search query text
+            context: Tool context
+            limit: Maximum number of results
+            similarity_threshold: Minimum similarity score (0-1) for cosine distance.
+                                  With cosine: 0.30 = 30% similar (good for fuzzy matching)
+                                  With L2: this threshold won't work correctly!
+        
+        Returns:
+            List of matching memories sorted by similarity
+        """
+        import logging
+        logger = logging.getLogger(__name__)
 
         def _search():
             collection = self._get_collection()
@@ -305,7 +340,13 @@ class ChromaAgentMemory(AgentMemory):
             )
 
             search_results = []
+            
+            # Log search attempt
+            query_preview = query[:50] + "..." if len(query) > 50 else query
+            
             if results["ids"] and len(results["ids"][0]) > 0:
+                logger.info(f"🔎 ChromaDB found {len(results['ids'][0])} candidates for: '{query_preview}'")
+                
                 for i, (id_, distance, metadata) in enumerate(
                     zip(
                         results["ids"][0],
@@ -313,7 +354,13 @@ class ChromaAgentMemory(AgentMemory):
                         results["metadatas"][0],
                     )
                 ):
+                    # For COSINE distance: similarity = 1 - distance (range 0-1)
+                    # For L2 distance: this formula doesn't work (distance can be > 1)
                     similarity_score = max(0, 1 - distance)
+                    
+                    content_preview = metadata.get("content", "")[:60]
+                    passed = "✅" if similarity_score >= similarity_threshold else "❌"
+                    logger.info(f"   [{i+1}] {passed} similarity={similarity_score:.3f} (threshold={similarity_threshold}): '{content_preview}...'")
 
                     if similarity_score >= similarity_threshold:
                         memory = TextMemory(
@@ -329,6 +376,10 @@ class ChromaAgentMemory(AgentMemory):
                                 rank=i + 1,
                             )
                         )
+                
+                logger.info(f"   📊 Returning {len(search_results)} memories above threshold")
+            else:
+                logger.info(f"🔎 ChromaDB: No text memories found in collection")
 
             return search_results
 

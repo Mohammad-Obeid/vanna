@@ -1,8 +1,26 @@
 """DataFrame component for displaying tabular data."""
 
+import math
 from typing import Any, Dict, List, Optional
 from pydantic import Field
 from ....core.rich_component import RichComponent, ComponentType
+
+
+def sanitize_value(val: Any) -> Any:
+    """Sanitize a value for JSON serialization."""
+    if val is None:
+        return None
+    if isinstance(val, float):
+        if math.isnan(val) or math.isinf(val):
+            return None
+    if isinstance(val, bytes):
+        return val.decode('utf-8', errors='replace')
+    return val
+
+
+def sanitize_record(record: Dict[str, Any]) -> Dict[str, Any]:
+    """Sanitize all values in a record for JSON serialization."""
+    return {k: sanitize_value(v) for k, v in record.items()}
 
 
 class DataFrameComponent(RichComponent):
@@ -41,6 +59,9 @@ class DataFrameComponent(RichComponent):
         # Set defaults before calling super().__init__
         if "rows" not in kwargs:
             kwargs["rows"] = []
+        else:
+            # Sanitize rows to handle NaN, Infinity, bytes, etc.
+            kwargs["rows"] = [sanitize_record(r) if isinstance(r, dict) else r for r in kwargs["rows"]]
         if "columns" not in kwargs:
             kwargs["columns"] = []
         if "column_types" not in kwargs:
@@ -71,13 +92,15 @@ class DataFrameComponent(RichComponent):
         **kwargs: Any,
     ) -> "DataFrameComponent":
         """Create a DataFrame component from a list of record dictionaries."""
-        columns = list(records[0].keys()) if records else []
+        # Sanitize all records to handle NaN, Infinity, bytes, etc.
+        sanitized_records = [sanitize_record(r) for r in records]
+        columns = list(sanitized_records[0].keys()) if sanitized_records else []
 
         # Ensure we pass the required arguments correctly
         component_data = {
-            "rows": records,
+            "rows": sanitized_records,
             "columns": columns,
-            "row_count": len(records),
+            "row_count": len(sanitized_records),
             "column_count": len(columns),
             "column_types": {},  # Initialize empty dict
         }
