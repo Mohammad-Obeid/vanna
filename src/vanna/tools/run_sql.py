@@ -86,6 +86,9 @@ class RunSqlTool(Tool[RunSqlToolArgs]):
             # Use the injected SqlRunner to execute the query
             df = await self.sql_runner.run_sql(args, context)
 
+            # Capture pagination metadata before sanitization (df.attrs may be lost in copy)
+            pagination_metadata = df.attrs.get('pagination', None) if hasattr(df, 'attrs') else None
+            
             # Sanitize DataFrame for JSON serialization (handles NaN, Infinity, bytes)
             df = sanitize_dataframe(df)
 
@@ -135,11 +138,12 @@ class RunSqlTool(Tool[RunSqlToolArgs]):
 
                     result = f"{results_preview}\n\nResults saved to file: {filename}\n\n**IMPORTANT: FOR VISUALIZE_DATA USE FILENAME: {filename}**"
 
-                    # Create DataFrame component for UI
+                    # Create DataFrame component for UI with server-side pagination info if available
                     dataframe_component = DataFrameComponent.from_records(
                         records=cast(List[Dict[str, Any]], results_data),
                         title="Query Results",
                         description=f"SQL query returned {row_count} rows with {len(columns)} columns",
+                        server_pagination=pagination_metadata,  # Pass pagination info to component
                     )
 
                     ui_component = UiComponent(
@@ -154,6 +158,10 @@ class RunSqlTool(Tool[RunSqlToolArgs]):
                         "results": results_data,
                         "output_file": filename,
                     }
+                    
+                    # Include server-side pagination metadata if available
+                    if pagination_metadata:
+                        metadata["pagination"] = pagination_metadata
             else:
                 # For non-SELECT queries (INSERT, UPDATE, DELETE, etc.)
                 # The SqlRunner should return a DataFrame with affected row count

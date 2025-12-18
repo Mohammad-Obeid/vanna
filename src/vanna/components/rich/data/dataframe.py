@@ -46,9 +46,16 @@ class DataFrameComponent(RichComponent):
     bordered: bool = True
     compact: bool = False
 
-    # Pagination
+    # Pagination (client-side)
     paginated: bool = True
     page_size: int = 25
+    
+    # Server-side pagination info (for large result sets)
+    # This is populated by PaginatedSqlRunner when SQL results are paginated at the database level
+    server_pagination: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Server-side pagination metadata: {page, page_size, total_count, total_pages, has_next, has_prev, sql}"
+    )
 
     # Data types for better formatting (optional)
     column_types: Dict[str, str] = Field(
