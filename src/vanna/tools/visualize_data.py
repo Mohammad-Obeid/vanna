@@ -76,6 +76,13 @@ class VisualizeDataTool(Tool[VisualizeDataArgs]):
                 f"Parsed DataFrame with shape {df.shape}, columns: {df.columns.tolist()}, dtypes: {df.dtypes.to_dict()}"
             )
 
+            # Limit data to 500 rows for chart generation
+            original_row_count = len(df)
+            MAX_CHART_ROWS = 500
+            if original_row_count > MAX_CHART_ROWS:
+                logger.info(f"Limiting chart data from {original_row_count} to {MAX_CHART_ROWS} rows")
+                df = df.head(MAX_CHART_ROWS)
+            
             # Generate title
             title = args.title or f"Visualization of {args.filename}"
 
@@ -89,7 +96,10 @@ class VisualizeDataTool(Tool[VisualizeDataArgs]):
             # Create result message
             row_count = len(df)
             col_count = len(df.columns)
-            result = f"Created visualization from '{args.filename}' ({row_count} rows, {col_count} columns)."
+            if original_row_count > MAX_CHART_ROWS:
+                result = f"Created visualization from '{args.filename}' (showing {row_count} of {original_row_count} rows, {col_count} columns). Note: Chart limited to first {MAX_CHART_ROWS} rows for performance."
+            else:
+                result = f"Created visualization from '{args.filename}' ({row_count} rows, {col_count} columns)."
 
             # Create ChartComponent
             logger.info("Creating ChartComponent...")
@@ -100,6 +110,8 @@ class VisualizeDataTool(Tool[VisualizeDataArgs]):
                 config={
                     "data_shape": {"rows": row_count, "columns": col_count},
                     "source_file": args.filename,
+                    "original_rows": original_row_count,
+                    "data_limited": original_row_count > MAX_CHART_ROWS,
                 },
             )
             logger.info("ChartComponent created successfully")
@@ -116,6 +128,8 @@ class VisualizeDataTool(Tool[VisualizeDataArgs]):
                     "filename": args.filename,
                     "rows": row_count,
                     "columns": col_count,
+                    "original_rows": original_row_count,
+                    "data_limited": original_row_count > MAX_CHART_ROWS,
                     "chart": chart_dict,
                 },
             )

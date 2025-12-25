@@ -120,10 +120,14 @@ class RunSqlTool(Tool[RunSqlToolArgs]):
                     columns = df.columns.tolist()
                     row_count = len(df)
 
-                    # Write DataFrame to CSV file for downstream tools
+                    # Write DataFrame to CSV file for downstream tools (e.g., charts)
+                    # Limit to 500 rows for chart generation performance
+                    # If data has <= 500 rows, use all; if > 500, use first 500
                     file_id = str(uuid.uuid4())[:8]
                     filename = f"query_results_{file_id}.csv"
-                    csv_content = df.to_csv(index=False)
+                    MAX_CSV_ROWS = 500
+                    csv_df = df.head(MAX_CSV_ROWS) if len(df) > MAX_CSV_ROWS else df
+                    csv_content = csv_df.to_csv(index=False)
                     await self.file_system.write_file(
                         filename, csv_content, context, overwrite=True
                     )

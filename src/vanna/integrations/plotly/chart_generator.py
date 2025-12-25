@@ -48,13 +48,7 @@ class PlotlyChartGenerator:
         if df.empty:
             raise ValueError("Cannot visualize empty DataFrame")
 
-        # Heuristic: If 4 or more columns, render as a table
-        if len(df.columns) >= 4:
-            fig = self._create_table(df, title)
-            result: Dict[str, Any] = json.loads(pio.to_json(fig))
-            return result
-
-        # Identify column types
+        # Identify column types first (before deciding on table vs chart)
         numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
         categorical_cols = df.select_dtypes(
             include=["object", "category"]
@@ -64,7 +58,10 @@ class PlotlyChartGenerator:
         # Check for time series
         is_timeseries = len(datetime_cols) > 0
 
-        # Apply heuristics
+        # SMART HEURISTIC: Try to create meaningful charts even with many columns
+        # Only fall back to table if we can't find chartable data
+        
+        # Apply heuristics (prioritize charts over tables)
         if is_timeseries and len(numeric_cols) > 0:
             # Time series line chart
             fig = self._create_time_series_chart(
@@ -87,16 +84,19 @@ class PlotlyChartGenerator:
         elif len(categorical_cols) >= 2:
             # Multiple categorical: grouped bar chart
             fig = self._create_grouped_bar_chart(df, categorical_cols, title)
+        elif len(df.columns) >= 2:
+            # Fallback: try to create a chart from first 2-3 meaningful columns
+            # This handles the case of many columns (4+) where we still want a chart
+            fig = self._create_generic_chart(
+                df, df.columns[0], df.columns[1], title
+            )
         else:
-            # Fallback: show first two columns as scatter/bar
-            if len(df.columns) >= 2:
-                fig = self._create_generic_chart(
-                    df, df.columns[0], df.columns[1], title
-                )
+            # Last resort: single column, create histogram or table
+            if len(numeric_cols) == 1:
+                fig = self._create_histogram(df, numeric_cols[0], title)
             else:
-                raise ValueError(
-                    "Cannot determine appropriate visualization for this DataFrame"
-                )
+                # Only create table if we absolutely can't make a chart
+                fig = self._create_table(df, title)
 
         # Convert to JSON-serializable dict using plotly's JSON encoder
         result = json.loads(pio.to_json(fig))
