@@ -1028,6 +1028,7 @@ class Agent:
                 )
 
                 # Yield final text response
+                logger.info(f"🔍 Final response check: has_content={bool(response.content)}, content_len={len(response.content) if response.content else 0}, has_tool_calls={bool(response.tool_calls)}")
                 if response.content:
                     # Add assistant response to conversation
                     conversation.add_message(
@@ -1039,6 +1040,8 @@ class Agent:
                         ),
                         simple_component=SimpleTextComponent(text=response.content),
                     )
+                else:
+                    logger.warning("⚠️ LLM response has NO content - nothing will be shown to user!")
                 break
 
         # Check if we hit the tool iteration limit
@@ -1353,7 +1356,9 @@ You can:
                 attributes={"model": getattr(self.llm_service, "model", "unknown")},
             )
 
+        chunk_count = 0
         async for chunk in self.llm_service.stream_request(request):
+            chunk_count += 1
             if chunk.content:
                 accumulated_content += chunk.content
                 # Could yield intermediate TextChunk here
@@ -1370,6 +1375,13 @@ You can:
                 await self.observability_provider.record_metric(
                     "llm.stream.duration", stream_span.duration_ms() or 0, "ms"
                 )
+
+        # Debug logging for empty responses
+        logger.info(f"🔍 LLM Stream Complete: chunks={chunk_count}, content_len={len(accumulated_content)}, tool_calls={len(accumulated_tool_calls)}")
+        if chunk_count == 0:
+            logger.warning("⚠️ LLM returned ZERO chunks!")
+        if not accumulated_content and not accumulated_tool_calls:
+            logger.warning("⚠️ LLM returned EMPTY response (no content, no tool calls)!")
 
         response = LlmResponse(
             content=accumulated_content if accumulated_content else None,

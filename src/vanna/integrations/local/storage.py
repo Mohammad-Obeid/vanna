@@ -5,10 +5,13 @@ This module provides a simple in-memory implementation of the ConversationStore
 interface, useful for testing and development.
 """
 
+import logging
 from typing import Dict, List, Optional
 
 from vanna.core.storage import ConversationStore, Conversation, Message
 from vanna.core.user import User
+
+logger = logging.getLogger(__name__)
 
 
 class MemoryConversationStore(ConversationStore):
@@ -16,6 +19,7 @@ class MemoryConversationStore(ConversationStore):
 
     def __init__(self) -> None:
         self._conversations: Dict[str, Conversation] = {}
+        logger.info("🆕 MemoryConversationStore initialized")
 
     async def create_conversation(
         self, conversation_id: str, user: User, initial_message: str
@@ -27,6 +31,7 @@ class MemoryConversationStore(ConversationStore):
             messages=[Message(role="user", content=initial_message)],
         )
         self._conversations[conversation_id] = conversation
+        logger.info(f"💾 Created conversation {conversation_id} for user {user.id}, total: {len(self._conversations)}")
         return conversation
 
     async def get_conversation(
@@ -34,13 +39,18 @@ class MemoryConversationStore(ConversationStore):
     ) -> Optional[Conversation]:
         """Get conversation by ID, scoped to user."""
         conversation = self._conversations.get(conversation_id)
-        if conversation and conversation.user.id == user.id:
-            return conversation
-        return None
+        logger.info(f"🔍 get_conversation({conversation_id}, user={user.id}): found={conversation is not None}, total_stored={len(self._conversations)}")
+        if conversation:
+            logger.info(f"   Stored user_id={conversation.user.id}, messages={len(conversation.messages)}")
+            if conversation.user.id != user.id:
+                logger.warning(f"   ⚠️ USER MISMATCH! Stored: {conversation.user.id}, Requested: {user.id}")
+                return None
+        return conversation
 
     async def update_conversation(self, conversation: Conversation) -> None:
         """Update conversation with new messages."""
         self._conversations[conversation.id] = conversation
+        logger.info(f"💾 Updated conversation {conversation.id}, messages={len(conversation.messages)}, total_stored={len(self._conversations)}")
 
     async def delete_conversation(self, conversation_id: str, user: User) -> bool:
         """Delete conversation."""

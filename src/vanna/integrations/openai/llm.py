@@ -105,7 +105,12 @@ class OpenAILlmService(LlmService):
         Emits `LlmStreamChunk` for textual deltas as they arrive. Tool-calls are
         accumulated and emitted in a final chunk when the stream ends.
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        
         payload = self._build_payload(request)
+        
+        logger.info(f"🔍 OpenAI stream_request called: model={self.model}, has_tools={bool(payload.get('tools'))}, tool_count={len(payload.get('tools', []))}")
 
         # Synchronous streaming iterator; iterate within async context.
         stream = self._client.chat.completions.create(**payload, stream=True)
@@ -113,8 +118,12 @@ class OpenAILlmService(LlmService):
         # Builders for streamed tool-calls (index -> partial)
         tc_builders: Dict[int, Dict[str, Optional[str]]] = {}
         last_finish: Optional[str] = None
+        chunk_count = 0
+        content_chunks = 0
+        tool_call_chunks = 0
 
         for event in stream:
+            chunk_count += 1
             if not getattr(event, "choices", None):
                 continue
 
@@ -128,11 +137,13 @@ class OpenAILlmService(LlmService):
             # Text content
             content_piece: Optional[str] = getattr(delta, "content", None)
             if content_piece:
+                content_chunks += 1
                 yield LlmStreamChunk(content=content_piece)
 
             # Tool calls (streamed)
             streamed_tool_calls = getattr(delta, "tool_calls", None)
             if streamed_tool_calls:
+                tool_call_chunks += 1
                 for tc in streamed_tool_calls:
                     idx = getattr(tc, "index", 0) or 0
                     b = tc_builders.setdefault(
@@ -148,6 +159,8 @@ class OpenAILlmService(LlmService):
                             b["arguments"] = (b["arguments"] or "") + fn.arguments
 
             last_finish = getattr(choice, "finish_reason", last_finish)
+
+        logger.info(f"🔍 OpenAI stream complete: total_chunks={chunk_count}, content_chunks={content_chunks}, tool_call_chunks={tool_call_chunks}, tc_builders={len(tc_builders)}, finish={last_finish}")
 
         # Emit final tool-calls chunk if any
         final_tool_calls: List[ToolCall] = []
@@ -172,9 +185,11 @@ class OpenAILlmService(LlmService):
             )
 
         if final_tool_calls:
+            logger.info(f"🔧 Yielding {len(final_tool_calls)} tool calls: {[tc.name for tc in final_tool_calls]}")
             yield LlmStreamChunk(tool_calls=final_tool_calls, finish_reason=last_finish)
         else:
             # Still emit a terminal chunk to signal completion
+            logger.info(f"✅ No tool calls, yielding terminal chunk with finish={last_finish}")
             yield LlmStreamChunk(finish_reason=last_finish or "stop")
 
     async def validate_tools(self, tools: List[ToolSchema]) -> List[str]:
