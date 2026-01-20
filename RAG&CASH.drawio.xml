@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0" version="29.3.0">
+  <diagram name="RAG + Cache Pipeline (Actual Code)" id="VNFexCqg8C1qU1AecvjQ">
+    <mxGraphModel dx="2500" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="2339" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- ==================== TITLE ==================== -->
+        <mxCell id="title-1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=32;fontStyle=1;fontColor=#1a1a2e;" value="🔄 RAG + Cache System - Complete Pipeline" vertex="1">
+          <mxGeometry height="60" width="800" x="400" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="title-2" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=2;fontColor=#666666;" value="Based on actual code: vanna.py → semantic_cache.py → schema_rag_service.py → intent_service.py" vertex="1">
+          <mxGeometry height="30" width="800" x="400" y="75" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== STEP 1: USER INPUT ==================== -->
+        <mxCell id="step1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;fontStyle=1;shadow=1;" value="📝 Step 1: User Input (with typos)&#xa;&#xa;&quot;gete alll patints in 2024&quot;" vertex="1">
+          <mxGeometry height="80" width="320" x="640" y="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow 1→2 -->
+        <mxCell id="arrow-1-2" edge="1" parent="1" source="step1" target="step2" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#333333;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== STEP 2: SPELL CORRECTION ==================== -->
+        <mxCell id="step2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;fontStyle=1;shadow=1;" value="" vertex="1">
+          <mxGeometry height="160" width="400" x="600" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="step2-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#9673a6;" value="✏️ Step 2: Spell Correction (schema_rag_service.py)" vertex="1">
+          <mxGeometry height="25" width="380" x="610" y="235" as="geometry" />
+        </mxCell>
+        <mxCell id="step2-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" value="📚 Dictionary: Common English (153) + Schema tables + Table parts&#xa;🎯 Priority: Common words FIRST → Schema words SECOND&#xa;📏 Algorithm: Levenshtein Distance&#xa;&#xa;Example:&#xa;  &quot;gete&quot; → &quot;get&quot; (Common word, distance=1)&#xa;  &quot;patints&quot; → &quot;patients&quot; (Schema word, distance=2)&#xa;&#xa;Output: &quot;get all patients in 2024&quot;" vertex="1">
+          <mxGeometry height="120" width="380" x="610" y="260" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow 2→3 -->
+        <mxCell id="arrow-2-3" edge="1" parent="1" source="step2" target="step3" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#333333;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== STEP 3: INTENT EXTRACTION ==================== -->
+        <mxCell id="step3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;shadow=1;" value="" vertex="1">
+          <mxGeometry height="180" width="400" x="600" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="step3-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#d6b656;" value="🧠 Step 3: Intent Extraction (intent_service.py)" vertex="1">
+          <mxGeometry height="25" width="380" x="610" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="step3-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" value="🤖 LLM extracts intent from corrected question:&#xa;&#xa;Input: &quot;get all patients in 2024&quot;&#xa;&#xa;LLM Output:&#xa;{&#xa;  &quot;intent_name&quot;: &quot;GET_ALL_PATIENTS&quot;,&#xa;  &quot;datasource&quot;: &quot;DsId: 1&quot;,&#xa;  &quot;parameters&quot;: {&quot;year&quot;: &quot;2024&quot;}&#xa;}&#xa;&#xa;📝 Canonical Key: GET_ALL_PATIENTS | DsId: 1 | year=2024" vertex="1">
+          <mxGeometry height="140" width="380" x="610" y="450" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow 3→4 -->
+        <mxCell id="arrow-3-4" edge="1" parent="1" source="step3" target="step4" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#333333;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== STEP 4: CACHE LOOKUP (2 STAGES) ==================== -->
+        <mxCell id="step4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;shadow=1;strokeWidth=3;" value="" vertex="1">
+          <mxGeometry height="400" width="500" x="550" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="step4-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#6c8ebf;" value="🔍 Step 4: Cache Lookup - TWO STAGES (semantic_cache.py)" vertex="1">
+          <mxGeometry height="30" width="480" x="560" y="640" as="geometry" />
+        </mxCell>
+        
+        <!-- Stage 1: Vector Search -->
+        <mxCell id="stage1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" value="" vertex="1">
+          <mxGeometry height="150" width="460" x="570" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="stage1-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#d6b656;" value="🔎 Stage 1: Vector Similarity Search (limit=5)" vertex="1">
+          <mxGeometry height="20" width="400" x="580" y="685" as="geometry" />
+        </mxCell>
+        <mxCell id="stage1-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontFamily=Courier New;fontColor=#333333;" value="1. Convert canonical key to embedding vector&#xa;2. Search pgvector for TOP 5 similar entries&#xa;3. Threshold: 0.85 (85%) from System Config&#xa;&#xa;Results:&#xa;  #1: GET_ALL_PATIENTS | DsId:1 | year=2025 (0.9917) ← 99% similar!&#xa;  #2: GET_ALL_PATIENTS | DsId:1 | year=2024 (0.9915)&#xa;  #3: GET_ALL_PATIENTS | DsId:1 | year=2023 (0.9910)&#xa;  #4: COUNT_PATIENTS | DsId:1 | year=2024 (0.8500)&#xa;  #5: ..." vertex="1">
+          <mxGeometry height="120" width="440" x="580" y="705" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow Stage1 → Stage2 -->
+        <mxCell id="arrow-s1-s2" parent="1" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;strokeColor=#6c8ebf;" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="800" y="830" as="sourcePoint" />
+            <mxPoint x="800" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Stage 2: Parameter Filter -->
+        <mxCell id="stage2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="160" width="460" x="570" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="stage2-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#82b366;" value="✅ Stage 2: Parameter Filter (EXACT MATCH REQUIRED)" vertex="1">
+          <mxGeometry height="20" width="400" x="580" y="855" as="geometry" />
+        </mxCell>
+        <mxCell id="stage2-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontFamily=Courier New;fontColor=#333333;" value="Query params: {&quot;year&quot;: &quot;2024&quot;}&#xa;&#xa;For each candidate:&#xa;  #1: year=2025 → {&quot;year&quot;:&quot;2024&quot;} != {&quot;year&quot;:&quot;2025&quot;} ❌ REJECT&#xa;  #2: year=2024 → {&quot;year&quot;:&quot;2024&quot;} == {&quot;year&quot;:&quot;2024&quot;} ✅ MATCH!&#xa;&#xa;💡 WHY? Vector sees year=2024 ≈ year=2025 (99% similar!)&#xa;   Parameter Filter ensures EXACT match → correct data!&#xa;&#xa;First exact match wins → Use candidate #2" vertex="1">
+          <mxGeometry height="130" width="440" x="580" y="875" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== DECISION: CACHE HIT OR MISS ==================== -->
+        <mxCell id="decision" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontStyle=1;shadow=1;" value="Cache&#xa;Result?" vertex="1">
+          <mxGeometry height="100" width="120" x="740" y="1060" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow 4→Decision -->
+        <mxCell id="arrow-4-dec" edge="1" parent="1" source="step4" target="decision" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#333333;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== CACHE HIT PATH (RIGHT) ==================== -->
+        <mxCell id="hit-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;shadow=1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="200" width="350" x="1100" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="hit-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#82b366;" value="✅ CACHE HIT (vanna.py line ~870)" vertex="1">
+          <mxGeometry height="25" width="330" x="1110" y="1015" as="geometry" />
+        </mxCell>
+        <mxCell id="hit-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" value="When: Parameter Filter finds exact match&#xa;&#xa;1. ✅ Get cached SQL from pgvector&#xa;2. ⏭️ Skip RAG completely (no table routing)&#xa;3. ⏭️ Skip LLM completely (no SQL generation)&#xa;4. 🔄 Re-execute cached SQL on database&#xa;5. 📊 Fetch fresh data (not stale cache!)&#xa;6. 📤 Return result with from_cache=true&#xa;&#xa;⏱️ Time saved: ~6-8 seconds (no LLM call!)&#xa;📁 Logged as: CACHE HIT in llm_interactions" vertex="1">
+          <mxGeometry height="160" width="330" x="1110" y="1040" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow Decision → HIT -->
+        <mxCell id="arrow-dec-hit" edge="1" parent="1" source="decision" target="hit-box" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#82b366;fontStyle=1;fontSize=12;" value="HIT ✅">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== CACHE MISS PATH (LEFT) ==================== -->
+        <mxCell id="miss-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#b85450;" value="MISS ❌" vertex="1">
+          <mxGeometry height="20" width="60" x="640" y="1090" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow Decision → MISS -->
+        <mxCell id="arrow-dec-miss" edge="1" parent="1" source="decision" target="rag-phase" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#b85450;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== RAG PHASE A: TABLE ROUTING ==================== -->
+        <mxCell id="rag-phase" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;fontStyle=1;shadow=1;strokeWidth=3;" value="" vertex="1">
+          <mxGeometry height="380" width="450" x="80" y="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="rag-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#9673a6;" value="🎯 PHASE A: Table Routing (schema_rag_service.py)" vertex="1">
+          <mxGeometry height="25" width="430" x="90" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="rag-subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;fontColor=#666666;" value="Goal: Find candidate tables BEFORE expensive embedding search" vertex="1">
+          <mxGeometry height="20" width="430" x="90" y="1235" as="geometry" />
+        </mxCell>
+        
+        <!-- A.1 Lexical Matching -->
+        <mxCell id="a1-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#9673a6;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="120" width="410" x="100" y="1265" as="geometry" />
+        </mxCell>
+        <mxCell id="a1-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#9673a6;" value="A.1: Lexical Matching (Direct Text Match)" vertex="1">
+          <mxGeometry height="20" width="380" x="110" y="1270" as="geometry" />
+        </mxCell>
+        <mxCell id="a1-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="Match types: Exact | Singular/Plural | Fuzzy (Levenshtein ≤ 2)&#xa;&#xa;Example: &quot;patients&quot; → &quot;patient&quot; table (singular match)&#xa;&#xa;⭐ TRUSTED - NO THRESHOLD CHECK!&#xa;Result: lexical_tables = [&quot;patient&quot;]" vertex="1">
+          <mxGeometry height="80" width="380" x="110" y="1290" as="geometry" />
+        </mxCell>
+        
+        <!-- A.2 Semantic Search -->
+        <mxCell id="a2-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#9673a6;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="140" width="410" x="100" y="1395" as="geometry" />
+        </mxCell>
+        <mxCell id="a2-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#9673a6;" value="A.2: Semantic Search on Identity Chunks (Always Runs)" vertex="1">
+          <mxGeometry height="20" width="380" x="110" y="1400" as="geometry" />
+        </mxCell>
+        <mxCell id="a2-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="Even with lexical match, RAG finds RELATED tables&#xa;Search: chunk_type = &quot;identity&quot; only (fast routing)&#xa;Threshold: score ≥ 0.15 for semantic matches&#xa;&#xa;Result: candidate_tables = [&#xa;  patient, sample_per_patient, visits_count_per_patient,&#xa;  doctors_data, doctor, test_result, appointment&#xa;]" vertex="1">
+          <mxGeometry height="100" width="380" x="110" y="1420" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== RAG PHASE B: FILTERED RETRIEVAL ==================== -->
+        <mxCell id="rag-phase-b" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;shadow=1;strokeWidth=3;" value="" vertex="1">
+          <mxGeometry height="580" width="500" x="560" y="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="rag-b-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#82b366;" value="📊 PHASE B: Filtered Retrieval (Semantic Search)" vertex="1">
+          <mxGeometry height="25" width="480" x="570" y="1210" as="geometry" />
+        </mxCell>
+        <mxCell id="rag-b-subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2;fontColor=#666666;" value="Goal: Deep semantic search ONLY in candidate tables (not entire schema)" vertex="1">
+          <mxGeometry height="20" width="480" x="570" y="1235" as="geometry" />
+        </mxCell>
+        
+        <!-- B.1 Embedding -->
+        <mxCell id="b1-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#82b366;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="80" width="460" x="580" y="1265" as="geometry" />
+        </mxCell>
+        <mxCell id="b1-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#82b366;" value="B.1: Convert Question to Embedding Vector" vertex="1">
+          <mxGeometry height="20" width="400" x="590" y="1270" as="geometry" />
+        </mxCell>
+        <mxCell id="b1-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="Model: all-MiniLM-L6-v2 (~80MB, no GPU needed)&#xa;Dimensions: 384 floats | Speed: ~14,000 sentences/sec&#xa;Output: [0.023, -0.156, 0.089, ..., 0.045]" vertex="1">
+          <mxGeometry height="45" width="440" x="590" y="1290" as="geometry" />
+        </mxCell>
+        
+        <!-- B.2 Filtered Search -->
+        <mxCell id="b2-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="110" width="460" x="580" y="1355" as="geometry" />
+        </mxCell>
+        <mxCell id="b2-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#6c8ebf;" value="B.2: FILTERED Search (Key Optimization)" vertex="1">
+          <mxGeometry height="20" width="400" x="590" y="1360" as="geometry" />
+        </mxCell>
+        <mxCell id="b2-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="Filter: table_name IN [candidate_tables from Phase A]&#xa;&#xa;WITHOUT Filter: 301 tables × 5 chunks = 1505 chunks (~500ms)&#xa;WITH Filter: 7 tables × 5 chunks = 35 chunks (~5ms) ⚡100x FASTER!&#xa;&#xa;Query: Find top 50 chunks most similar to question embedding" vertex="1">
+          <mxGeometry height="80" width="440" x="590" y="1380" as="geometry" />
+        </mxCell>
+        
+        <!-- B.3 Chunk Types -->
+        <mxCell id="b3-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#82b366;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="280" width="460" x="580" y="1475" as="geometry" />
+        </mxCell>
+        <mxCell id="b3-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#82b366;" value="B.3: 5 Chunk Types per Table (WHY?)" vertex="1">
+          <mxGeometry height="20" width="400" x="590" y="1480" as="geometry" />
+        </mxCell>
+        <mxCell id="b3-why" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=9;fontStyle=2;fontColor=#666666;" value="One big document = averaged embedding = loses specificity&#xa;5 focused chunks = specialized embeddings = much better matching" vertex="1">
+          <mxGeometry height="25" width="440" x="590" y="1500" as="geometry" />
+        </mxCell>
+        <mxCell id="chunk-types" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=9;fontFamily=Courier New;fontColor=#333333;" value="┌─────────────────────────────────────────────────────────┐&#xa;│ CHUNK 1: identity     │ Table name + purpose            │&#xa;│ CHUNK 2: time_fields  │ Date/time columns (birth_date)  │&#xa;│ CHUNK 3: business_fields │ Human-readable (name, email) │&#xa;│ CHUNK 4: technical_fields │ IDs, PKs, FKs               │&#xa;│ CHUNK 5: relationships │ Foreign key references          │&#xa;└─────────────────────────────────────────────────────────┘&#xa;&#xa;Example: &quot;patients in 2024&quot;&#xa;  → time_fields chunk gets HIGHEST score (0.78)&#xa;  → because &quot;2024&quot; = year = time concept!&#xa;  → identity chunk only gets 0.45&#xa;&#xa;Results (Top 10):&#xa;  #1 patient.time_fields    (0.78) ← LEXICAL&#xa;  #2 patient.identity       (0.65) ← LEXICAL&#xa;  #3 test_result.time_fields (0.52) ← SELECTED&#xa;  #4 appointment.time_fields (0.48) ← SELECTED&#xa;  #5 doctor.identity        (0.34) ← SELECTED" vertex="1">
+          <mxGeometry height="200" width="440" x="590" y="1530" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow Phase A → Phase B -->
+        <mxCell id="arrow-a-b" edge="1" parent="1" source="rag-phase" target="rag-phase-b" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#9673a6;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== RAG PHASE C: SCHEMA SELECTION ==================== -->
+        <mxCell id="rag-phase-c" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;shadow=1;strokeWidth=3;" value="" vertex="1">
+          <mxGeometry height="350" width="450" x="1100" y="1250" as="geometry" />
+        </mxCell>
+        <mxCell id="rag-c-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#6c8ebf;" value="📋 PHASE C: Schema Selection (Final Rules)" vertex="1">
+          <mxGeometry height="25" width="430" x="1110" y="1260" as="geometry" />
+        </mxCell>
+        
+        <!-- Selection Rules -->
+        <mxCell id="rules-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#6c8ebf;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="150" width="410" x="1120" y="1290" as="geometry" />
+        </mxCell>
+        <mxCell id="rules-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#6c8ebf;" value="Selection Rules (apply_strict_selection_rules):" vertex="1">
+          <mxGeometry height="20" width="380" x="1130" y="1295" as="geometry" />
+        </mxCell>
+        <mxCell id="rules-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="Rule 0 (LEXICAL): Tables from lexical match → NO THRESHOLD! ⭐&#xa;Rule 1 (SEMANTIC): Tables with max_score ≥ 0.10 → INCLUDE&#xa;Rule 2 (HIGH SCORE): Tables with score ≥ 0.40 → Add up to 4 more&#xa;Rule 3 (MENTIONED): Tables in question → MUST INCLUDE&#xa;Rule 4 (LIMIT): Maximum 10 tables total&#xa;Rule 5 (SORT): Sort by score (highest first)" vertex="1">
+          <mxGeometry height="110" width="390" x="1130" y="1315" as="geometry" />
+        </mxCell>
+        
+        <!-- Final Tables -->
+        <mxCell id="final-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="130" width="410" x="1120" y="1455" as="geometry" />
+        </mxCell>
+        <mxCell id="final-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontStyle=1;fontColor=#82b366;" value="Final Selected Tables:" vertex="1">
+          <mxGeometry height="20" width="380" x="1130" y="1460" as="geometry" />
+        </mxCell>
+        <mxCell id="final-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="Rule 0 (LEXICAL):  patient            (0.78) - NO THRESHOLD!&#xa;Rule 1 (SEMANTIC): test_result        (0.52 ≥ 0.10)&#xa;Rule 1 (SEMANTIC): appointment        (0.48 ≥ 0.10)&#xa;Rule 1 (SEMANTIC): sample_per_patient (0.38 ≥ 0.10)&#xa;Rule 1 (SEMANTIC): doctor             (0.34 ≥ 0.10)&#xa;&#xa;📤 Output: DDL for 5 tables sent to LLM (not 301! = 98% reduction)" vertex="1">
+          <mxGeometry height="100" width="390" x="1130" y="1480" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow Phase B → Phase C -->
+        <mxCell id="arrow-b-c" edge="1" parent="1" source="rag-phase-b" target="rag-phase-c" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#82b366;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== LLM GENERATE SQL ==================== -->
+        <mxCell id="llm-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;shadow=1;" value="" vertex="1">
+          <mxGeometry height="130" width="450" x="575" y="1820" as="geometry" />
+        </mxCell>
+        <mxCell id="llm-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#d79b00;" value="🤖 Step 5: LLM Generates SQL" vertex="1">
+          <mxGeometry height="25" width="430" x="585" y="1825" as="geometry" />
+        </mxCell>
+        <mxCell id="llm-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" value="Model: GPT-4 / Claude / Gemini (configurable)&#xa;&#xa;Input: SQL Rules + Reduced Schema (5 tables DDL) + Question&#xa;&#xa;Output:&#xa;SELECT * FROM patient&#xa;WHERE EXTRACT(YEAR FROM created_at) = 2024" vertex="1">
+          <mxGeometry height="90" width="420" x="585" y="1850" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow Phase C → LLM -->
+        <mxCell id="arrow-c-llm" edge="1" parent="1" source="rag-phase-c" target="llm-box" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#6c8ebf;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1325" y="1650" />
+              <mxPoint x="1325" y="1750" />
+              <mxPoint x="800" y="1750" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- ==================== EXECUTE SQL ==================== -->
+        <mxCell id="exec-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1;shadow=1;" value="" vertex="1">
+          <mxGeometry height="80" width="450" x="575" y="1980" as="geometry" />
+        </mxCell>
+        <mxCell id="exec-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#b85450;" value="⚡ Step 6: Execute SQL (Oracle/PostgreSQL)" vertex="1">
+          <mxGeometry height="25" width="430" x="585" y="1985" as="geometry" />
+        </mxCell>
+        <mxCell id="exec-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" value="Database: Oracle (MEDICARE on 213.6.48.25:1522)&#xa;Result: 70,614 total rows | Displayed: 10 rows (page 1) | Pagination: server-side" vertex="1">
+          <mxGeometry height="40" width="420" x="585" y="2010" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow LLM → Execute -->
+        <mxCell id="arrow-llm-exec" edge="1" parent="1" source="llm-box" target="exec-box" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#d79b00;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== SAVE TO CACHE ==================== -->
+        <mxCell id="save-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;shadow=1;" value="" vertex="1">
+          <mxGeometry height="120" width="450" x="575" y="2090" as="geometry" />
+        </mxCell>
+        <mxCell id="save-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#82b366;" value="💾 Step 7: Save to Semantic Cache" vertex="1">
+          <mxGeometry height="25" width="430" x="585" y="2095" as="geometry" />
+        </mxCell>
+        <mxCell id="save-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=11;fontColor=#333333;" value="Canonical Key: GET_ALL_PATIENTS | DsId: 1 | year=2024&#xa;Embedding: all-MiniLM-L6-v2 (384 dimensions)&#xa;Stored: SQL + Result data + Intent metadata&#xa;&#xa;🔄 Next time same intent (different words!) → instant cache hit!&#xa;   &quot;show me patients from 2024&quot; → Same intent → CACHE HIT!" vertex="1">
+          <mxGeometry height="80" width="420" x="585" y="2120" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow Execute → Save -->
+        <mxCell id="arrow-exec-save" edge="1" parent="1" source="exec-box" target="save-box" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#b85450;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== RETURN RESULT ==================== -->
+        <mxCell id="result-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1;shadow=1;strokeWidth=2;" value="📤 Step 8: Return Result to User&#xa;&#xa;Data Table (paginated) + Charts + AI Insights" vertex="1">
+          <mxGeometry height="80" width="450" x="575" y="2240" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow Save → Result -->
+        <mxCell id="arrow-save-result" edge="1" parent="1" source="save-box" target="result-box" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#82b366;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow HIT → Result (FAST PATH) -->
+        <mxCell id="arrow-hit-result" edge="1" parent="1" source="hit-box" target="result-box" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#82b366;dashed=1;dashPattern=8 8;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1275" y="1220" />
+              <mxPoint x="1500" y="1220" />
+              <mxPoint x="1500" y="2280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fast-path-label" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#82b366;" value="⚡ FAST PATH&#xa;Skip RAG + LLM!" vertex="1">
+          <mxGeometry height="40" width="100" x="1510" y="1700" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== KEY INSIGHTS BOX ==================== -->
+        <mxCell id="insights-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;shadow=1;strokeWidth=2;" value="" vertex="1">
+          <mxGeometry height="430" width="300" x="1100" y="1900" as="geometry" />
+        </mxCell>
+        <mxCell id="insights-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#333333;" value="💡 Key Insights" vertex="1">
+          <mxGeometry height="25" width="280" x="1110" y="1910" as="geometry" />
+        </mxCell>
+        <mxCell id="insights-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="1️⃣ TWO-STAGE CACHE LOOKUP:&#xa;   • Stage 1: Vector similarity (finds similar)&#xa;   • Stage 2: Parameter filter (exact match)&#xa;   • Prevents year=2024 matching year=2025!&#xa;&#xa;2️⃣ SPELL CORRECTION PRIORITY:&#xa;   • Common words FIRST (get, all, show)&#xa;   • Schema words SECOND (patient, doctor)&#xa;&#xa;3️⃣ LEXICAL TABLES ARE TRUSTED:&#xa;   • No threshold check needed!&#xa;   • Direct user intent = high confidence&#xa;&#xa;4️⃣ RAG ALWAYS RUNS ON MISS:&#xa;   • Even with lexical match&#xa;   • Finds RELATED tables&#xa;&#xa;5️⃣ CHUNKING STRATEGY:&#xa;   • 5 chunks per table&#xa;   • Better semantic matching&#xa;   • 100x faster filtered search&#xa;&#xa;6️⃣ INTENT-BASED CACHING:&#xa;   • Different words → Same intent → HIT&#xa;   • &quot;show patients&quot; = &quot;list patients&quot;&#xa;   • Parameters must match exactly!" vertex="1">
+          <mxGeometry height="380" width="280" x="1110" y="1935" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== TIMING BOX ==================== -->
+        <mxCell id="timing-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;shadow=1;" value="" vertex="1">
+          <mxGeometry height="180" width="300" x="80" y="1620" as="geometry" />
+        </mxCell>
+        <mxCell id="timing-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#d6b656;" value="⏱️ Performance Timing" vertex="1">
+          <mxGeometry height="25" width="280" x="90" y="1625" as="geometry" />
+        </mxCell>
+        <mxCell id="timing-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="CACHE HIT PATH (~4 seconds):&#xa;  • Cache lookup: 2-3 sec&#xa;  • SQL execution: 1-2 sec&#xa;  • ⏭️ Skip: RAG + LLM&#xa;&#xa;CACHE MISS PATH (~12 seconds):&#xa;  • Cache lookup: 2-3 sec&#xa;  • RAG search: ~0.7 ms ⚡&#xa;  • LLM generation: 6-8 sec&#xa;  • SQL execution: 1-2 sec&#xa;  • Cache save: ~100 ms" vertex="1">
+          <mxGeometry height="140" width="280" x="90" y="1650" as="geometry" />
+        </mxCell>
+        
+        <!-- ==================== TECHNOLOGIES BOX ==================== -->
+        <mxCell id="tech-box" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;shadow=1;" value="" vertex="1">
+          <mxGeometry height="180" width="300" x="80" y="1820" as="geometry" />
+        </mxCell>
+        <mxCell id="tech-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#9673a6;" value="🛠️ Technologies Used" vertex="1">
+          <mxGeometry height="25" width="280" x="90" y="1825" as="geometry" />
+        </mxCell>
+        <mxCell id="tech-content" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#333333;" value="📦 Vector Database: PostgreSQL + pgvector&#xa;   Port: 5433 | DB: ubs-analytics3&#xa;&#xa;🧠 Embedding Model: all-MiniLM-L6-v2&#xa;   Dimensions: 384 | Local (no API)&#xa;&#xa;🗄️ Primary Database: Oracle&#xa;   MEDICARE on 213.6.48.25:1522&#xa;&#xa;🤖 LLM: GPT-4 / Claude / Gemini&#xa;&#xa;📊 Cache Threshold: 85% (from System Config)" vertex="1">
+          <mxGeometry height="140" width="280" x="90" y="1850" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
